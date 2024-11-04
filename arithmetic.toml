@@ -11,6 +11,7 @@ return = "void"
 [head.types.method]
 name = "add"
 stc = true
+stc_code = 2
 args = ["STC_TYPE", "STC_TYPE", "STC_I64", "STC_I64"]
 return = "void"
 code = []
@@ -29,12 +30,17 @@ function = "add_I64_I64"
 name = "add_I64_I64"
 args = ["STC_I64", "STC_I64"]
 return = "void"
-stc = false
+stc = true
+stc_code = 255
+stc_name = "addI"
 code = ["push(arg0+arg1, STC_I64_TYPE);"]
 
 [[body.method]]
 name = "add_F64_F64"
 args = ["STC_I64", "STC_I64"]
 return = "void"
-stc = false
+stc = true
+stc_code = 255
+stc_name = "addF"
+
 code = ["push(*(double *)&arg0+*(double *)&arg1, STC_FLOAT_TYPE);"]

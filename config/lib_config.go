@@ -31,11 +31,13 @@ type HeadTypes struct {
 
 // Method represents the [head.types.method] table within [head.types]
 type Method struct {
-	Name   string   `toml:"name"`
-	Stc    bool     `toml:"stc"`
-	Args   []string `toml:"args"`
-	Return string   `toml:"return"`
-	Code   []string `toml:"code"`
+	Name    string   `toml:"name"`
+	Stc     bool     `toml:"stc"`
+	Args    []string `toml:"args"`
+	Return  string   `toml:"return"`
+	Code    []string `toml:"code"`
+	StcCode int      `toml:"stc_code"`
+	StcName *string  `toml:"stc_name"`
 }
 
 // TypeMatch represents each [[head.types.match]] entry

@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"stclibmake/config"
 	"stclibmake/stc"
 	"strconv"
 )
 
-func BuildLib(config *config.LibConfig) {
-	file, err := os.Create(config.Head.Name + ".c")
+func BuildLib(config *config.LibConfig, out string) {
+	file, err := os.Create(filepath.Join(out, config.Head.Name+".c"))
 	if err != nil {
 		fmt.Println("Error creating file:", err)
 		return
@@ -18,12 +19,12 @@ func BuildLib(config *config.LibConfig) {
 
 	writeHead(config.Head, config.Body.Method, file)
 	writeBody(config.Body, file)
-	createHeaderFile(config)
+	createHeaderFile(config, out)
 
 }
 
-func createHeaderFile(cfg *config.LibConfig) {
-	file, err := os.Create(cfg.Head.Name + ".h")
+func createHeaderFile(cfg *config.LibConfig, out string) {
+	file, err := os.Create(filepath.Join(out, cfg.Head.Name+".h"))
 
 	if len(cfg.Head.Includes) != 0 {
 		writeIncludes(cfg.Head.Includes, file)
@@ -207,7 +208,17 @@ func getMatrix(match []config.TypeMatch, methods []config.Method, types config.H
 			fmt.Println("Error:", err1, err2, err3)
 			os.Exit(1)
 		}
-		matrix[argA][argB] = t.Function
+		method, err := stc.GetMethod(methods, t.Function)
+		if err != nil {
+			fmt.Println("Error:", err)
+			os.Exit(1)
+		}
+		if method.Stc {
+			matrix[argA][argB] = "stc_" + t.Function
+
+		} else {
+			matrix[argA][argB] = t.Function
+		}
 	}
 	return matrix
 }

@@ -1,0 +1,6 @@
+root_input = "."
+root_output = "build"
+
+libs = [
+    "arithmetic"
+]

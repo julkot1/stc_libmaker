@@ -155,3 +155,12 @@ func ValidFunctionType(methods []config.Method, name string, returning string, a
 func ValidFunctionTypeMatrix(methods []config.Method, match config.TypeMatch, returning string, args []string) error {
 	return ValidFunctionType(methods, match.Function, returning, args)
 }
+
+func GetMethod(methods []config.Method, name string) (config.Method, error) {
+	for _, m := range methods {
+		if m.Name == name {
+			return m, nil
+		}
+	}
+	return config.Method{}, errors.New("method " + name + " not found")
+}

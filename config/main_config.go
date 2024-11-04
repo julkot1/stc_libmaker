@@ -7,8 +7,9 @@ import (
 )
 
 type LibsConfig struct {
-	Root string   `toml:"root"`
-	Libs []string `toml:"libs"`
+	RootInput  string   `toml:"root_input"`
+	RootOutput string   `toml:"root_output"`
+	Libs       []string `toml:"libs"`
 }
 
 func LoadConfig(path string) *LibsConfig {
