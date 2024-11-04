@@ -37,7 +37,9 @@ func createHeaderFile(cfg *config.LibConfig, out string) {
 	defer file.Close()
 	var methods []config.Method
 
-	methods = append(methods, cfg.Head.Types.Method)
+	for _, m := range cfg.Head.Types {
+		methods = append(methods, m.Method)
+	}
 	methods = append(methods, cfg.Body.Method...)
 
 	for _, method := range methods {
@@ -138,34 +140,29 @@ func getMethodSignature(m config.Method) string {
 func writeHead(head config.Head, methods []config.Method, file *os.File) {
 
 	file.WriteString("#include \"" + head.Name + ".h\"\n")
-	if head.Types.Name != "" {
-		writeTypes(head.Types, file)
-		writeMatrix(head.Types, methods, file)
-		writeMatchMethod(head.Types, methods, file)
+	for _, typ := range head.Types {
+		writeTypes(typ, file)
+		writeMatrix(typ, methods, file)
+		writeMatchMethod(typ, methods, file)
 	}
 
 }
 
 func writeMatchMethod(types config.HeadTypes, methods []config.Method, file *os.File) {
-	if len(types.Args)*2 != len(types.Method.Args) {
-		fmt.Println("Error: number of arguments does not match number of types in match method " + types.Name)
-		os.Exit(-1)
-	}
 	matrixArgs := ""
 	callArgs := ""
 
 	for i, n := range types.Method.Args {
 		if n == stc.C_TYPE_T.String() {
 			matrixArgs = matrixArgs + "[arg" + strconv.Itoa(i) + "]"
-		} else {
-			callArgs = callArgs + "arg" + strconv.Itoa(i) + ","
 		}
+		callArgs = callArgs + "arg" + strconv.Itoa(i) + ","
 	}
 	callArgs = callArgs[:len(callArgs)-1]
 
 	types.Method.Code = append(types.Method.Code, types.TypeName+" f = "+types.Name+matrixArgs+";")
 	types.Method.Code = append(types.Method.Code, "if(f != 0)")
-	types.Method.Code = append(types.Method.Code, "\tf("+callArgs+")")
+	types.Method.Code = append(types.Method.Code, "\tf("+callArgs+");")
 
 	writeMethod(types.Method, file)
 
@@ -203,9 +200,8 @@ func getMatrix(match []config.TypeMatch, methods []config.Method, types config.H
 	for _, t := range match {
 		argA, err1 := stc.MatchTypeSTC(stc.ToSctType(t.ArgA))
 		argB, err2 := stc.MatchTypeSTC(stc.ToSctType(t.ArgB))
-		err3 := stc.ValidFunctionTypeMatrix(methods, t, types.Return, types.Args)
-		if err1 != nil || err2 != nil || err3 != nil {
-			fmt.Println("Error:", err1, err2, err3)
+		if err1 != nil || err2 != nil {
+			fmt.Println("Error:", err1, err2)
 			os.Exit(1)
 		}
 		method, err := stc.GetMethod(methods, t.Function)
@@ -224,9 +220,10 @@ func getMatrix(match []config.TypeMatch, methods []config.Method, types config.H
 }
 
 func writeTypes(types config.HeadTypes, file *os.File) {
-
-	args := getArgs(types.Args)
-	file.WriteString("typedef " + types.Return + " (*" + types.TypeName + ")(" + args + ");\n")
+	if types.Args != nil {
+		args := getArgs(*types.Args)
+		file.WriteString("typedef " + *types.Return + " (*" + types.TypeName + ")(" + args + ");\n")
+	}
 
 }
 

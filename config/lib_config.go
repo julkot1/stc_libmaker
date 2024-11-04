@@ -14,17 +14,17 @@ type LibConfig struct {
 
 // Head represents the [head] section
 type Head struct {
-	Name     string    `toml:"name"`
-	Includes []string  `toml:"includes"`
-	Types    HeadTypes `toml:"types"`
+	Name     string      `toml:"name"`
+	Includes []string    `toml:"includes"`
+	Types    []HeadTypes `toml:"types"`
 }
 
 // HeadTypes represents the [head.types] table within [head]
 type HeadTypes struct {
 	TypeName string      `toml:"type_name"`
 	Name     string      `toml:"name"`
-	Args     []string    `toml:"args"`
-	Return   string      `toml:"return"`
+	Args     *[]string   `toml:"args"`
+	Return   *string     `toml:"return"`
 	Method   Method      `toml:"method"`
 	Match    []TypeMatch `toml:"match"`
 }
